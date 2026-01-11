@@ -27,6 +27,10 @@ resource "yandex_compute_disk" "boot-disk-2" {
   image_id = "fd861t36p9dqjfrqm0g4"
 }
 
+data "yandex_vpc_subnet" "default-ru-central1-b" {
+  name = "default-ru-central1-b"
+}
+
 resource "yandex_compute_instance" "build" {
   name = "build"
 
