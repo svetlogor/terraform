@@ -62,10 +62,9 @@ resource "yandex_compute_instance" "build" {
 
     inline = [
       "sudo apt update && sudo apt install -y default-jdk maven tomcat9",
-      "git clone /tmp/java-app/https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
+      "cd /tmp && mkdir java-app && git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
       "cd /tmp/java-app && mvn package",
-      "cp /tmp/java-app/target/hello-1.0.war /var/lib/tomcat9/webapps",
-      "sudo systemctl start docker"
+      "cp /tmp/java-app/target/hello-1.0.war /var/lib/tomcat9/webapps"
     ]
   }
 }
