@@ -102,6 +102,18 @@ resource "yandex_compute_instance" "prod" {
     ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   }
 
+  provisioner "file" {
+    source      = "/tmp/hello-1.0"
+    destination = "/tmp/hello-1.0"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.network_interface.0.nat_ip_address
+    }
+  }
+
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -112,19 +124,8 @@ resource "yandex_compute_instance" "prod" {
 
     inline = [
       "sudo apt update && sudo apt install -y tomcat9",
+      "sudo cp /tmp/hello-1.0 /var/lib/tomcat9/webapps"
       ]
-  }
-
-  provisioner "file" {
-    source      = "/tmp/hello-1.0"
-    destination = "/var/lib/tomcat9/webapps/hello-1.0"
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file("~/.ssh/id_rsa")
-      host        = self.network_interface.0.nat_ip_address
-    }
   }
 
   depends_on = [yandex_compute_instance.build]
