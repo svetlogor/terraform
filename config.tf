@@ -43,6 +43,10 @@ resource "yandex_compute_instance" "build" {
     disk_id = yandex_compute_disk.boot-disk-1.id
   }
 
+  scheduling_policy {
+    preemptible = true
+  }
+
   network_interface {
     subnet_id = data.yandex_vpc_subnet.network1-b.id
     nat       = true
@@ -62,8 +66,8 @@ resource "yandex_compute_instance" "build" {
 
     inline = [
       "sudo apt update && sudo apt install -y default-jdk maven tomcat9",
-      "sudo cd /tmp && git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
-      "sudo cd /tmp/boxfuse-sample-java-war-hello && mvn package",
+      "cd /tmp && git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
+      "cd /tmp/boxfuse-sample-java-war-hello && mvn package",
       "sudo cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /var/lib/tomcat9/webapps"
     ]
   }
@@ -79,6 +83,10 @@ resource "yandex_compute_instance" "prod" {
 
   boot_disk {
     disk_id = yandex_compute_disk.boot-disk-2.id
+  }
+
+  scheduling_policy {
+    preemptible = true
   }
 
   network_interface {
