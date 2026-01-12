@@ -68,7 +68,9 @@ resource "yandex_compute_instance" "build" {
       "sudo apt update && sudo apt install -y default-jdk maven tomcat9",
       "cd /tmp && git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
       "cd /tmp/boxfuse-sample-java-war-hello && mvn package",
-      "sudo cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /var/lib/tomcat9/webapps && sudo cp /var/lib/tomcat9/webapps/hello-1.0 /tmp && sudo chown -R ubuntu:ubuntu /tmp/hello-1.0"
+      "sudo cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /var/lib/tomcat9/webapps",
+      "sleep 10",
+      "sudo cp /var/lib/tomcat9/webapps/hello-1.0 /tmp && sudo chown -R ubuntu:ubuntu /tmp/hello-1.0"
     ]
   }
 
