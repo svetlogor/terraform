@@ -51,6 +51,23 @@ resource "yandex_compute_instance" "build" {
   metadata = {
     ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   }
+
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.network_interface.0.nat_ip_address
+    }
+
+    inline = [
+      "sudo apt update && sudo apt install -y default-jdk maven tomcat9",
+      "git clone /tmp/java-app/https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
+      "cd /tmp && mvn package",
+      "cp /tmp/java-app/target/hello-1.0.war /var/lib/tomcat9/webapps",
+      "sudo systemctl start docker"
+    ]
+  }
 }
 
 resource "yandex_compute_instance" "prod" {
