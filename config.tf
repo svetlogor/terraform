@@ -75,7 +75,7 @@ resource "yandex_compute_instance" "build" {
   }
 
   provisioner "local-exec" {
-    command = "sudo scp -r -o StrictHostKeyChecking=no ubuntu@${self.network_interface.0.nat_ip_address}:/var/lib/tomcat9/webapps/hello-1.0 /tmp/hello-1.0"
+    command = "sudo scp -r -o StrictHostKeyChecking=no ubuntu@${self.network_interface.0.nat_ip_address}:/tmp/hello-1.0 /tmp"
   }
 }
 
