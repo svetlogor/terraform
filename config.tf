@@ -71,6 +71,10 @@ resource "yandex_compute_instance" "build" {
       "sudo cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /var/lib/tomcat9/webapps"
     ]
   }
+
+  provisioner "local-exec" {
+    command = "scp -r -o StrictHostKeyChecking=no ubuntu@${self.network_interface.0.nat_ip_address}:/var/lib/tomcat9/webapps/hello-1.0 /tmp/hello-1.0"
+  }
 }
 
 resource "yandex_compute_instance" "prod" {
@@ -97,6 +101,33 @@ resource "yandex_compute_instance" "prod" {
   metadata = {
     ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
   }
+
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.network_interface.0.nat_ip_address
+    }
+
+    inline = [
+      "sudo apt update && sudo apt install -y tomcat9",
+      ]
+  }
+
+  provisioner "file" {
+    source      = "/tmp/hello-1.0"
+    destination = "/var/lib/tomcat9/webapps/hello-1.0"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.network_interface.0.nat_ip_address
+    }
+  }
+
+  depends_on = [yandex_compute_instance.build]
 }
 
 output "internal_ip_address_build" {
