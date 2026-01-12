@@ -68,14 +68,12 @@ resource "yandex_compute_instance" "build" {
       "sudo apt update && sudo apt install -y default-jdk maven tomcat9",
       "cd /tmp && git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
       "cd /tmp/boxfuse-sample-java-war-hello && mvn package",
-      "sudo cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /var/lib/tomcat9/webapps",
-      "sleep 10",
-      "sudo cp -r /var/lib/tomcat9/webapps/hello-1.0 /tmp && sudo chown -R ubuntu:ubuntu /tmp/hello-1.0"
+      "sudo cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war"
     ]
   }
 
   provisioner "local-exec" {
-    command = "sudo scp -r -o StrictHostKeyChecking=no ubuntu@${self.network_interface.0.nat_ip_address}:/tmp/hello-1.0 /tmp"
+    command = "sudo scp -r -o StrictHostKeyChecking=no ubuntu@${self.network_interface.0.nat_ip_address}:/tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /tmp"
   }
 }
 
@@ -105,8 +103,8 @@ resource "yandex_compute_instance" "prod" {
   }
 
   provisioner "file" {
-    source      = "/tmp/hello-1.0"
-    destination = "/tmp/hello-1.0"
+    source      = "/tmp/hello-1.0.war"
+    destination = "/tmp/hello-1.0.war"
 
     connection {
       type        = "ssh"
@@ -126,7 +124,7 @@ resource "yandex_compute_instance" "prod" {
 
     inline = [
       "sudo apt update && sudo apt install -y tomcat9",
-      "sudo cp -r /tmp/hello-1.0 /var/lib/tomcat9/webapps"
+      "sudo cp /tmp/hello-1.0.war /var/lib/tomcat9/webapps"
       ]
   }
 
